@@ -1,0 +1,46 @@
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: aws-efs
+provisioner: aws.io/aws-efs
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: airflow-dev-logs
+  namespace: dev
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 512Mi
+  storageClassName: aws-efs
+
+
+# apiVersion: storage.k8s.io/v1
+# kind: StorageClass
+# metadata:
+#   name: efs-sc
+# provisioner: aws.io/aws-efs
+# parameters:
+#   provisioningMode: efs
+#   fileSystemId: fs-07072260bd767873b
+#   directoryPerms: "777"
+#   gidRangeStart: "1000"
+#   gidRangeEnd: "2000"
+# reclaimPolicy: Retain
+# volumeBindingMode: Immediate
+# ---
+# apiVersion: v1
+# kind: PersistentVolumeClaim
+# metadata:
+#   name: airflow-dev-logs
+#   namespace: dev
+# spec:
+#   accessModes:
+#     - ReadWriteMany
+#   storageClassName: efs-sc
+#   resources:
+#     requests:
+#       storage: 5Gi

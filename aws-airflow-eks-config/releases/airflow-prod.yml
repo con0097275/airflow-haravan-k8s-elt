@@ -1,0 +1,153 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: airflow
+  namespace: prod
+spec:
+  interval: 30s
+  releaseName: airflow-prod
+  chart:
+    spec:
+      chart: airflow
+      version: "8.9.0"
+      sourceRef:
+        kind: HelmRepository
+        name: apache-airflow
+        namespace: flux-system
+  values:
+    airflow:
+      image:
+        repository: "037372950777.dkr.ecr.ap-northeast-1.amazonaws.com/airflow-eks-docker-main"
+        tag: "a802ed13"
+        # repository: apache/airflow
+        # tag: "2.8.4"
+      executor: "KubernetesExecutor"
+      config:
+        AIRFLOW__CORE__LOAD_EXAMPLES: "False"
+        AIRFLOW__KUBERNETES_EXECUTOR__NAMESPACE: "prod"
+        # AIRFLOW__KUBERNETES_EXECUTOR__WORKER_CONTAINER_REPOSITORY: "037372950777.dkr.ecr.ap-northeast-1.amazonaws.com/airflow-eks-docker-prod"
+        # AIRFLOW__KUBERNETES_EXECUTOR__WORKER_CONTAINER_TAG: "14067539"
+        AIRFLOW__KUBERNETES_EXECUTOR__WORKER_CONTAINER_REPOSITORY: "037372950777.dkr.ecr.ap-northeast-1.amazonaws.com/airflow-eks-docker-main"
+        AIRFLOW__KUBERNETES_EXECUTOR__WORKER_CONTAINER_TAG: "a802ed13"
+        AIRFLOW__KUBERNETES__DAGS_IN_IMAGE: "True"   ## comment if using Gitsync
+        AIRFLOW__WEBSERVER__BASE_URL: "https://airflow-prod.ttc-agris.com"
+        AIRFLOW__WEBSERVER__WEB_SERVER_HOST: "0.0.0.0"
+        AIRFLOW__WEBSERVER__ENABLE_PROXY_FIX: "True"
+        # Making Web server stateless with DAG Serialization
+        AIRFLOW__CORE__STORE_SERIALIZED_DAGS: "True"
+        AIRFLOW__CORE__STORE_DAG_CODE: "True"
+        AIRFLOW__CORE__MIN_SERIALIZED_DAG_UPDATE_INTERVAL: "30"
+        # AIRFLOW__WEBSERVER__WEB_SERVER_URL_PREFIX: "/airflow-prod"
+        AIRFLOW__LOGGING__REMOTE_LOGGING: "True"  # AIRFLOW__CORE__REMOTE_LOGGING: "True"
+        AIRFLOW__CORE__REMOTE_LOG_CONN_ID: "vannk_aws_s3_sm"
+        # AIRFLOW__CORE__REMOTE_LOG_CONN_ID: "aws_s3_log_storage"   ## work with the s3 remote not have the secret manager section
+        AIRFLOW__CORE__REMOTE_BASE_LOG_FOLDER: "s3://vannk-airflow-eks-logs/prod"
+        # AIRFLOW_CONN_AWS_S3_LOG_STORAGE: 'aws://AKIAQRM4Z7D46ZMUCQRA:1MsaO0dq%2BAmN0Bg3FCtxD3N%2B%2BA3Hi%2BZWisJFGrs5@'
+        AIRFLOW__SECRETS__BACKEND: "airflow.providers.amazon.aws.secrets.secrets_manager.SecretsManagerBackend"
+        AIRFLOW__SECRETS__BACKEND_KWARGS: >
+          {
+            "connections_prefix": "airflow/connections",
+            "region_name": "ap-northeast-1"
+          }
+          
+      extraEnv:
+        - name: AWS_DEFAULT_REGION
+          valueFrom:
+            secretKeyRef:
+              name: airflow-sm
+              key: aws-default-region
+        - name: AWS_ACCESS_KEY_ID
+          valueFrom:
+            secretKeyRef:
+              name: airflow-sm
+              key: aws-access-key-id
+        - name: AWS_SECRET_ACCESS_KEY
+          valueFrom:
+            secretKeyRef:
+              name: airflow-sm
+              key: aws-secret-access-key
+
+
+    web:
+      replicas: 3
+      livenessProbe:
+        enabled: true
+        initialDelaySeconds: 90        # wait longer for startup
+        periodSeconds: 20              # check every 20 seconds
+        timeoutSeconds: 10             # allow 10s for response
+        failureThreshold: 6            # only fail if 6 times in a row it fails (~2 mins)
+        # successThreshold: 1
+      readinessProbe:
+        enabled: true
+        initialDelaySeconds: 90        # wait longer for startup
+        periodSeconds: 20              # check every 20 seconds
+        timeoutSeconds: 10             # allow 10s for response
+        failureThreshold: 6            # only fail if 6 times in a row it fails (~2 mins)
+        # successThreshold: 1
+     #   service:
+    #     type: LoadBalancer  # ✅ Expose web UI via LoadBalancer    
+       
+    scheduler:
+      logCleanup:
+        enabled: false
+    
+    triggerer:
+      logCleanup:
+        enabled: false
+    
+    logs:
+      path: /opt/airflow/logs
+      # persistence:
+      #   enabled: true
+      #   existingClaim: airflow-prod-logs
+      #   subPath: ""            # optional, keep empty if not using subdirectories
+      #   storageClass: ""       # leave blank if using an existingClaim
+      #   accessMode: ReadWriteMany
+      #   size: 1Gi 
+
+    postgresql:
+      enabled: false
+    redis:
+      enabled: false
+    pgbouncer:
+      enabled: false
+    flower:
+      enabled: false
+    workers:
+      enabled: false
+      
+    externalDatabase:
+      type: postgres
+      host: vannk-airflow-eks-db-1.czsamewos9uk.ap-northeast-1.rds.amazonaws.com
+      port: 5432
+      database: airflow_prod
+      user: postgres
+      password: ...
+      properties: "?sslmode=require"
+    
+    # ingress:
+    #   enabled: true
+    #   web:
+    #     path: "/airflow-prod"  # must match prefix above
+    #     ingressClassName: "alb"
+    #     annotations:
+    #       kubernetes.io/ingress.class: alb
+    #       alb.ingress.kubernetes.io/scheme: internet-facing
+    #       alb.ingress.kubernetes.io/target-type: ip
+    #       alb.ingress.kubernetes.io/healthcheck-path: /airflow-prod/health
+    #       alb.ingress.kubernetes.io/success-codes: "200,302"
+    
+          
+    dags:
+      persistence:
+        enabled: false  
+      gitSync:
+        enabled: false  
+        # enabled: true
+        # repo: git@github.com:con0097275/airflow-eks-private-dags.git
+        # branch: main
+        # maxFailures: 0
+        # subPath: ""
+        # wait: 30
+        # sshSecret: airflow-ssh-secret
+        # sshSecretKey: id_rsa  # ✅ Add this line

@@ -1,0 +1,86 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: airflow
+  namespace: staging
+spec:
+  interval: 30s
+  releaseName: airflow-staging
+  chart:
+    spec:
+      chart: airflow
+      version: "8.9.0"
+      sourceRef:
+        kind: HelmRepository
+        name: apache-airflow
+        namespace: flux-system
+  values:
+    airflow:
+      image:
+        repository: "037372950777.dkr.ecr.ap-northeast-1.amazonaws.com/airflow-eks-docker-staging"
+        tag: "6fd6ac71"
+        # repository: apache/airflow
+        # tag: "2.8.4"
+      executor: "KubernetesExecutor"
+      config:
+        AIRFLOW__CORE__LOAD_EXAMPLES: "False"
+        AIRFLOW__KUBERNETES_EXECUTOR__NAMESPACE: "staging"
+        # AIRFLOW__KUBERNETES_EXECUTOR__WORKER_CONTAINER_REPOSITORY: "037372950777.dkr.ecr.ap-northeast-1.amazonaws.com/airflow-eks-docker-staging"
+        # AIRFLOW__KUBERNETES_EXECUTOR__WORKER_CONTAINER_TAG: "6fd6ac71"
+        AIRFLOW__KUBERNETES_EXECUTOR__WORKER_CONTAINER_REPOSITORY: "037372950777.dkr.ecr.ap-northeast-1.amazonaws.com/airflow-eks-docker-staging"
+        AIRFLOW__KUBERNETES_EXECUTOR__WORKER_CONTAINER_TAG: "6fd6ac71"
+        AIRFLOW__KUBERNETES__DAGS_IN_IMAGE: "True"
+        AIRFLOW__WEBSERVER__BASE_URL: "https://airflow-staging.ttc-agris.com"
+        AIRFLOW__WEBSERVER__ENABLE_PROXY_FIX: "True"
+        # AIRFLOW__WEBSERVER__WEB_SERVER_URL_PREFIX: "/airflow-staging"
+
+        
+    web:
+      replicas: 2
+    #   service:
+    #     type: LoadBalancer  # ✅ Expose web UI via LoadBalancer    
+    postgresql:
+      enabled: false
+    redis:
+      enabled: false
+    pgbouncer:
+      enabled: false
+    flower:
+      enabled: false
+    workers:
+      enabled: false
+      
+    externalDatabase:
+      type: postgres
+      host: vannk-airflow-eks-db-1.czsamewos9uk.ap-northeast-1.rds.amazonaws.com
+      port: 5432
+      database: airflow_staging
+      user: postgres
+      password: anhhungnhaxi123
+      properties: "?sslmode=require"
+    
+    # ingress:
+    #   enabled: true
+    #   web:
+    #     path: "/airflow-staging"  # must match prefix above
+    #     ingressClassName: "alb"
+    #     annotations:
+    #       kubernetes.io/ingress.class: alb
+    #       alb.ingress.kubernetes.io/scheme: internet-facing
+    #       alb.ingress.kubernetes.io/target-type: ip
+    #       alb.ingress.kubernetes.io/healthcheck-path: /airflow-staging/health
+    #       alb.ingress.kubernetes.io/success-codes: "200,302"
+    
+          
+    dags:
+      persistence:
+        enabled: false  
+      gitSync:
+        enabled: false
+        # repo: git@github.com:con0097275/airflow-eks-private-dags.git
+        # branch: main
+        # maxFailures: 0
+        # subPath: ""
+        # wait: 60
+        # sshSecret: airflow-ssh-secret
+        # sshSecretKey: id_rsa  # ✅ Add this line

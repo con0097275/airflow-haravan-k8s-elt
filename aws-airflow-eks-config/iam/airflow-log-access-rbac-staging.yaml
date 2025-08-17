@@ -1,0 +1,24 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: airflow-log-access
+  namespace: staging
+rules:
+  - apiGroups: [""]
+    resources: ["pods", "pods/log"]
+    verbs: ["get", "list", "watch"]
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: airflow-log-access-binding
+  namespace: staging
+subjects:
+  - kind: ServiceAccount
+    name: airflow-staging
+    namespace: staging
+roleRef:
+  kind: Role
+  name: airflow-log-access
+  apiGroup: rbac.authorization.k8s.io
