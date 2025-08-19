@@ -9,3 +9,6 @@ Build Airflow with Kubernetes Executor mode with highly availabity and scabality
 
 Setup Airflow running with Beautiful Domain name using Route 53 integrate with Load balancer AWS
 
+Build Haravan ELT pipeline with factory pattern design and Medalion architect. 
+Integrate UnitTest and Integration to new airflow pipeline in CICD Airflow design.
+
