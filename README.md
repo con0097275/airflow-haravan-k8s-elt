@@ -15,3 +15,16 @@ Integrate UnitTest and Integration to new airflow pipeline in CICD Airflow desig
 ![1](image/airflowraw.png)
 
 ![2](image/airflow2.png)
+
+CICD:
+![3](image/eksCICD.png)
+
+![4](image/web_illustration.png)
+
+
+
+
+Haravan Airflow Pipeline:
+![5](image/haravanpipelines.png)
+
+![6](image/haravanpipelines2.png)
