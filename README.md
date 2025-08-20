@@ -12,3 +12,4 @@ Setup Airflow running with Beautiful Domain name using Route 53 integrate with L
 Build Haravan ELT pipeline with factory pattern design and Medalion architect. 
 Integrate UnitTest and Integration to new airflow pipeline in CICD Airflow design.
 
+![alt text](image/airflowraw.png)
