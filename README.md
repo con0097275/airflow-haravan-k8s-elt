@@ -23,7 +23,7 @@ CICD:
 
 ![4](image/web_illustration.png)
 
-
+![4](image/flowCICD-EKS.png)
 
 
 Haravan Airflow Pipeline:
