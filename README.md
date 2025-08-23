@@ -56,6 +56,29 @@ This project sets up a scalable, production-grade data orchestration platform us
 ---
 
 
+## 📁 Project Structure
+
+airflow-eks-docker/
+│
+├── config/ # Airflow config templates
+├── dags/ # Airflow DAG definitions (ELT workflows)
+├── integrationtests/ # Integration tests for full pipeline execution
+├── script/ # Utility or bootstrap scripts for deployment
+├── unittests/ # Unit tests for DAG components and operators
+│
+├── .env # Environment variables for local development
+├── airflow.cfg # Base Airflow configuration file
+├── docker-compose.yml # Local Airflow setup (optional for local dev)
+├── Dockerfile # Docker image definition for Airflow
+├── requirements-python3.7.txt # Python dependencies
+├── unittests.cfg # Pytest/unittest configuration
+│
+aws-airflow-eks-config/ # EKS and Helm chart configurations
+aws-cicd/cloudformation/ # CloudFormation templates for CI/CD pipeline
+
+
+---
+
 <b>Airflow:</b>
 ![1](image/airflowraw.png)
 
