@@ -57,7 +57,7 @@ This project sets up a scalable, production-grade data orchestration platform us
 
 
 ## 📁 Project Structure
-
+<pre><code>
 airflow-eks-docker/
 │
 ├── config/ # Airflow config templates
@@ -75,7 +75,7 @@ airflow-eks-docker/
 │
 aws-airflow-eks-config/ # EKS and Helm chart configurations
 aws-cicd/cloudformation/ # CloudFormation templates for CI/CD pipeline
-
+</code></pre>
 
 ---
 
