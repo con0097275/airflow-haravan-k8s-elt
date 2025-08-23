@@ -1,24 +1,67 @@
-<h1>PROJECT AIRFLOW EKS CICD & HARAVAN API PIPELINE WITH FACTORY PATTERN DESIGN INTEGRATED</h1>
+# Airflow on AWS EKS with CI/CD & Haravan API Pipeline
+
+This project sets up a scalable, production-grade data orchestration platform using **Apache Airflow on AWS EKS**, integrated with **Haravan APIs**, and designed with modern engineering principles such as CI/CD automation, Medallion architecture, and the Factory Pattern.
+
+---
+
+## 🚀 Project Overview
+
+- **Purpose**: Automate and scale data extraction pipelines from Haravan API into a Medallion data lake architecture (Bronze → Silver → Gold).
+- **Technologies**: Apache Airflow, AWS EKS, Helm, CodePipeline, CodeBuild, ECR, CloudFormation, Kubernetes, Route53, Haravan API.
+
+---
+
+## ⚙️ Architecture Highlights
+
+### 1. Airflow Deployment on AWS EKS
+- Deployed Airflow via **Helm Chart** into **Amazon EKS** with three isolated environments:
+  - `dev`
+  - `staging`
+  - `prod`
+- Designed for **high availability**, **auto-scaling**, and **multi-AZ** redundancy within a single **VPC**.
+
+### 2. KubernetesExecutor Mode
+- Configured Airflow to use **KubernetesExecutor** to dynamically scale task execution on Kubernetes pods.
+- Suitable for large-scale task parallelism with optimized resource allocation.
+
+### 3. CI/CD Integration
+- Fully automated DAG deployment using:
+  - **GitHub** (source control)
+  - **AWS CodePipeline** & **CodeBuild** (CI/CD)
+  - **ECR** (Docker image registry)
+  - **CloudFormation** (infrastructure as code)
+- Each commit triggers build-test-deploy pipelines across all environments.
+
+### 4. Custom Domain & DNS Setup
+- Deployed Airflow webserver with a **branded domain name** via **Route 53**.
+- Integrated with **Application Load Balancer (ALB)** for secure and scalable traffic routing.
+
+---
+
+## 🔄 Haravan ELT Pipeline
+
+- Built modular **ELT pipelines** using the **Factory Pattern**, allowing reusable, scalable job creation for different Haravan API endpoints.
+- Follows the **Medallion Architecture**:
+  - **Bronze**: Raw data ingestion into S3
+  - **Silver**: Cleaned, enriched datasets
+  - **Gold**: Analytics-ready datasets
+
+---
+
+## 🧪 Testing & Quality Assurance
+
+- Integrated **unit tests** and **integration tests** into the CI/CD pipeline.
+- Tests are automatically executed before deployment to ensure pipeline stability and prevent regressions.
+
+---
 
 
-Deploy Airflow ready in Production in AWS EKS using HelmChart with 3 environments: Dev, Staging, Prod
-
-Build CICD to automatically deploy new dag Airflow Pipeline into EKS cluster using AWS CICD (CodePipeline, CodeBuild, Github, ECR), Cloudformation
-
-Build Airflow with Kubernetes Executor mode with highly availabity and scabality in 3 AZ in 1 VPC aws
-
-Setup Airflow running with Beautiful Domain name using Route 53 integrate with Load balancer AWS
-
-Build Haravan ELT pipeline with factory pattern design and Medalion architect. 
-Integrate UnitTest and Integration to new airflow pipeline in CICD Airflow design.
-
-
-Airflow:
+<b>Airflow:</b>
 ![1](image/airflowraw.png)
 
 ![2](image/airflow2.png)
 
-CICD:
+<b>CICD:</b>
 ![3](image/eksCICD.png)
 
 ![4](image/web_illustration.png)
@@ -26,19 +69,19 @@ CICD:
 ![4](image/flowCICD-EKS.png)
 
 
-Haravan Airflow Pipeline:
+<b>Haravan Airflow Pipeline:</b>
 ![5](image/haravanpipelines.png)
 
 ![6](image/haravanpipelines2.png)
 
 
-Redshift result:
+<b>Redshift result:</b>
 ![7](image/redshift1.png)
 
 ![8](image/redshift2.png)
 
 
-S3:
+<b>S3:</b>
 -bronze layer:
 ![7](image/bronze1.png)
 
@@ -48,5 +91,5 @@ S3:
 -silver layer:
 ![7](image/silver1.png)
 
-![8](image/silver2.png)
+![8](image/silver3.png)
 
